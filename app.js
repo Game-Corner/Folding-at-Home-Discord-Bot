@@ -1,137 +1,85 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const http = require('http');
-const https = require('https');
-const port = process.env.PORT;
+const http = require('https');
 
+function parameter (message, start) {
+  switch (message[start]) {
+    case '(':
 
-// Server keeps the bot up with Uptime Robot pinging it
-const requestHandler = (request, response) => {
-  console.log(request.url);
-  response.end('server requested');
+      break
+    case ' ':
+
+  }
 }
 
-const server = http.createServer(requestHandler);
-
-server.listen(port, (err) => {
-  if (err) {
-    return console.log('something bad happened', err)
-  }
-  console.log(`server is listening on ${port}`);
-});
-
+const embed = {
+  "title": "Seth_Deegan",
+  "description": "Donor Stats for user Seth_Deegan",
+  "url": "https://stats.foldingathome.org/donor/donor_id",
+  "color": 6437182,
+  "timestamp": "2020-05-21T19:24:48.407Z",
+  "footer": {
+    "icon_url": "https://cdn.discordapp.com/attachments/240552501982658560/713120635714273314/catiline.svg.png",
+    "text": "A Game Corner Bot"
+  },
+  "thumbnail": {
+    "url": "https://foldingathome.org/wp-content/uploads/2016/10/foldingathome-logo-300x127.png"
+  },
+  "author": {
+    "name": "Folding @ Home Stats",
+    "url": "https://github.com/Game-Corner/Folding-at-Home-Discord-Bot",
+    "icon_url": "https://foldingathome.org/wp-content/uploads/2016/09/folding-at-home-logo-300x300.png"
+  },
+  "fields": [
+    {
+      "name": "Date of Last Work Unit",
+      "value": "18:56:09 GMT, Thursday, 21, May, 2020"
+    },
+    {
+      "name": "Total Score",
+      "value": "5,499,752"
+    },
+    {
+      "name": "Total Work Units",
+      "value": "483"
+    },
+    {
+      "name": "Overall Rank",
+      "value": "79,320 of 2,700,088"
+    },
+    {
+      "name": "Active clients (within 50 days)",
+      "value": "2",
+      "inline": true
+    },
+    {
+      "name": "Active clients (within 7 days)",
+      "value": "2",
+      "inline": true
+    }
+  ]
+};
 
 // When discord.js client is ready
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('guildMemberRemove', member => {
-  member.createDM()
-    .then(DMchannel => {
-      DMchannel.send('Hey there, we\'d like to know why you left Game Corner so that future members have a better experience. Please type out your response in a message below. Thanks!');
-      const filter = m => m.author.id === member.id;
-      DMchannel.awaitMessages(filter, { max: 1, time: 86400000, errors: ['time'] })
-        .then(collected => {
-          client.fetchUser('240550416129982464')
-            .then(user => {
-              user.send(`Forner member ${member.displayName} left Game Corner and said: ${collected.values().next().value.toString()}`);
-            });
-        });
-    });
-});
-
 // When client receives a message
 client.on('message', msg => {
-  var msgMatch = msg.content.match(/\([^()]*\)|[^.]+(?=\([^()]*\))|[^.]+/g);
-  var username;
-  var method;
-  var value;
-  if (msgMatch[0] === 'API') {
-    if (msgMatch[1] === 'summoner') {
-      if (msgMatch.length === 3 || msgMatch.length === 4) {
-        if (msgMatch[2].startsWith('(') && msgMatch[2].endsWith(')')) {
-          var userMatch = msgMatch[2];
-          var username = userMatch.slice(1, -1);
-          if (username.match('^[A-z0-9 ]+$')) {
-            value = 3;
-            https.get('https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name/' + username + '?api_key=' + process.env.apikey, (res) => {
-              res.on('data', (d) => {
-                console.log('Riot API statusCode: ' + res.statusCode);
-                switch (res.statusCode) {
-                  case 400:
-                    msg.reply('Something went wrong with the request! Please try again.');
-                    break;
-                  case 401:
-                  case 403:
-                    msg.reply('The developer of GC-System is not authorized to use the Riot API. Please contact them for furthur details.');
-                    break;
-                  case 404:
-                    msg.reply('The username ' + username + ' is not found in NA1');
-                    break;
-                  case 405:
-                    msg.reply('The method connection is not allowed. Please contact the bot developer.');
-                    break;
-                  case 415:
-                    msg.reply('The username text is not supported.');
-                    break;
-                  case 422:
-                    msg.reply(username + ' exists, but hasn\'t played since match history collection began.');
-                    break;
-                  case 429:
-                    msg.reply('Too many requests are being made to the API. Please try again later.');
-                    break;
-                  case 500:
-                    msg.reply('There is an internal server error. Please contact the Riot Developer team here: <https://developer.riotgames.com/support/tickets/>.');
-                    break;
-                  case 502:
-                    msg.reply('There is a bad gateway. Please contact the developer of the bot.');
-                    break;
-                  case 503:
-                    msg.reply('The Riot API is currently unavailible. Please see <https://developer.riotgames.com/api-status/> for more details.');
-                    break;
-                  case 504:
-                    msg.reply('The response took too long. Please contact the developer of the bot.');
-                    break;
-                  case 200:
-                    var response = JSON.parse(d);
-                    var userResponse = JSON.stringify(response);
-                    if (msgMatch.length === 4) {
-                      method = msgMatch[3];
-                      var methodResponse = response[method];
-                      if (methodResponse !== undefined) {
-                        msg.reply('The ' + method + ' of ' + username + ' is ' + methodResponse);
-                      }
-                      else {
-                        msg.reply('This is not a valid property. You can find all of the properties at: <https://developer.riotgames.com/api-methods/#summoner-v3/GET_getBySummonerName>');
-                      }
-                    }
-                    else {
-                      msg.reply('The data for ' + username + ' is ' + userResponse);
-                    }
-                }
-              });
-            }).on('error', (e) => {
-              console.error(e);
-            });
-          }
-          else {
-            msg.reply('Usernames can only contain letters and numbers.');
-          }
+  // Split the message into an array based on the special "coding-like" input method
+  const message = msg.content.match(/\([^()]*\)|[^.]+(?=\([^()]*\))|[^.]+/g);
+
+  // The base URL for the F@H API end points
+  const base = 'https://stats.foldingathome.org/'
+
+  if (message[0] === '@') {
+    switch (message[1]) {
+      case 'doner':
+        if (msg.author.id == '713085095573192784') {
+          msg.reply( {embed} );
         }
-        else {
-          msg.reply('Please provid the username as a parameter of \`summoner\` for the summoner.');
-        }
-      }
-      else if (msgMatch.length > 4) {
-        msg.reply('There are no other parameters of those of \`summoner\`\'s.');
-      }
-      else {
-        msg.reply('Please provid a username as a parameter of \`summoner\` for the summoner.');
-      }
-    }
-    else {
-      msg.reply('Please provid a valid property of \`API\`. The only current property is \`summoner\`.');
+        break
     }
   }
 });
