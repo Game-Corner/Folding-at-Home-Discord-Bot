@@ -4,7 +4,8 @@
   "description": "A discord bot that lets users interface with the Folding @ Home Stats API",
   "main": "app.js",
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

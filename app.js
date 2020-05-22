@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+require('dotenv').config()
 const http = require('https');
 
 function parameter (message, start) {
@@ -12,7 +13,7 @@ function parameter (message, start) {
   }
 }
 
-const embed = {
+const standard = {
   "title": "Seth_Deegan",
   "description": "Donor Stats for user Seth_Deegan",
   "url": "https://stats.foldingathome.org/donor/donor_id",
@@ -63,25 +64,28 @@ const embed = {
 // When discord.js client is ready
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  client.user.setPresence({ activity: { name: 'f.help' } })
+    .then(console.log)
+    .catch(console.error);
 });
 
 // When client receives a message
 client.on('message', msg => {
   // Split the message into an array based on the special "coding-like" input method
-  const message = msg.content.match(/\([^()]*\)|[^.]+(?=\([^()]*\))|[^.]+/g);
+  var message = msg.content.match(/[^\.\(\)]+|\(|\)/g);
 
   // The base URL for the F@H API end points
   const base = 'https://stats.foldingathome.org/'
-
-  if (message[0] === '@') {
-    switch (message[1]) {
-      case 'doner':
-        if (msg.author.id == '713085095573192784') {
-          msg.reply( {embed} );
-        }
-        break
+  console.log(message);
+  if (message) {
+    if (message[0] === 'f') {
+      switch (message[1]) {
+        case 'donor':
+          msg.channel.send({ embed: standard });
+          break;
+      }
     }
   }
 });
 
-client.login(process.env.token);
+client.login(process.env.DISCORD_TOKEN);
