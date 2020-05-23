@@ -18,7 +18,8 @@ class Donor extends Response {
     constructor(msg, donor) {
         // Construct
         super(msg)
-        var data = request('donor', donor)
+        var data = await request('donor', donor)
+        
         /*
         var next = start + 1
         if (messageContents[next]) {
@@ -28,6 +29,7 @@ class Donor extends Response {
 
         // Apply embed changes
         var name = data.name;
+        console.log(name)
 
         this.embed.setTitle('donor.' + name);
         this.embed.setDescription("Donor Stats for user " + name);
