@@ -1,65 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 require('dotenv').config()
-const http = require('https');
-
-function parameter (message, start) {
-  switch (message[start]) {
-    case '(':
-
-      break
-    case ' ':
-
-  }
-}
-
-const standard = {
-  "title": "Seth_Deegan",
-  "description": "Donor Stats for user Seth_Deegan",
-  "url": "https://stats.foldingathome.org/donor/donor_id",
-  "color": 6437182,
-  "timestamp": "2020-05-21T19:24:48.407Z",
-  "footer": {
-    "icon_url": "https://cdn.discordapp.com/attachments/240552501982658560/713120635714273314/catiline.svg.png",
-    "text": "A Game Corner Bot"
-  },
-  "thumbnail": {
-    "url": "https://foldingathome.org/wp-content/uploads/2016/10/foldingathome-logo-300x127.png"
-  },
-  "author": {
-    "name": "Folding @ Home Stats",
-    "url": "https://github.com/Game-Corner/Folding-at-Home-Discord-Bot",
-    "icon_url": "https://foldingathome.org/wp-content/uploads/2016/09/folding-at-home-logo-300x300.png"
-  },
-  "fields": [
-    {
-      "name": "Date of Last Work Unit",
-      "value": "18:56:09 GMT, Thursday, 21, May, 2020"
-    },
-    {
-      "name": "Total Score",
-      "value": "5,499,752"
-    },
-    {
-      "name": "Total Work Units",
-      "value": "483"
-    },
-    {
-      "name": "Overall Rank",
-      "value": "79,320 of 2,700,088"
-    },
-    {
-      "name": "Active clients (within 50 days)",
-      "value": "2",
-      "inline": true
-    },
-    {
-      "name": "Active clients (within 7 days)",
-      "value": "2",
-      "inline": true
-    }
-  ]
-};
+const Donor = require('./responses')
 
 // When discord.js client is ready
 client.on('ready', () => {
@@ -72,20 +14,17 @@ client.on('ready', () => {
 // When client receives a message
 client.on('message', msg => {
   // Split the message into an array based on the special "coding-like" input method
-  var message = msg.content.match(/[^\.\(\)]+|\(|\)/g);
+  var messageContents = msg.content.match(/[^\.]+/g);
 
-  // The base URL for the F@H API end points
-  const base = 'https://stats.foldingathome.org/'
-  console.log(message);
-  if (message) {
-    if (message[0] === 'f') {
-      switch (message[1]) {
+  if (messageContents) {
+    if (messageContents[0] === 'f') {
+      switch (messageContents[1]) {
         case 'donor':
-          msg.channel.send({ embed: standard });
+          new Donor(msg, messageContents[2])
           break;
       }
     }
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.TOKEN);
